@@ -57,6 +57,46 @@ public class Joypad : MonoBehaviour
         }
         return false;
     }
+    public static bool OnButtonPressed_Start()
+    {
+        if (Hinput.anyGamepad.start.justPressed)
+        {
+            if (!canPress()) return false;
+            setPression();
+            return true;
+        }
+        return false;
+    }
+    public static bool OnButtonPressed_Select()
+    {
+        if (Hinput.anyGamepad.back.justPressed)
+        {
+            if (!canPress()) return false;
+            setPression();
+            return true;
+        }
+        return false;
+    }
+    public static bool OnRightStickPressed()
+    {
+        if (Hinput.anyGamepad.rightStickClick.justPressed)
+        {
+            if (!canPress()) return false;
+            setPression();
+            return true;
+        }
+        return false;
+    }
+    public static bool OnLeftStickPressed()
+    {
+        if (Hinput.anyGamepad.leftStickClick.justPressed)
+        {
+            if (!canPress()) return false;
+            setPression();
+            return true;
+        }
+        return false;
+    }
     public static bool OnButtonPressed_RB()
     {
         return Hinput.anyGamepad.rightBumper.pressed;
@@ -114,12 +154,73 @@ public class Joypad : MonoBehaviour
         return false;
     }
 
+    public static bool OnLeftStickMoved_Up()
+    {
+        return (Hinput.anyGamepad.leftStick.angle > 45f && Hinput.anyGamepad.leftStick.angle <= 135f);
+    }
+    public static bool OnLeftStickMoved_Down()
+    {
+        return (Hinput.anyGamepad.leftStick.angle <= -45f && Hinput.anyGamepad.leftStick.angle > -135f);
+    }
+    public static bool OnLeftStickMoved_Right()
+    {
+        return (Hinput.anyGamepad.leftStick.angle > -45f && Hinput.anyGamepad.leftStick.angle <= 45f && Hinput.anyGamepad.leftStick.angle != 0);
+    }
+    public static bool OnLeftStickMoved_Left()
+    {
+        return (
+            (Hinput.anyGamepad.leftStick.angle > 135f && Hinput.anyGamepad.leftStick.angle <= 180f) || 
+            (Hinput.anyGamepad.leftStick.angle <= -135f && Hinput.anyGamepad.leftStick.angle >= -180f)
+        );
+    }
+    public static bool OnRightStickMoved_Up()
+    {
+        return (Hinput.anyGamepad.rightStick.angle > 45f && Hinput.anyGamepad.rightStick.angle <= 135f);
+    }
+    public static bool OnRightStickMoved_Down()
+    {
+        return (Hinput.anyGamepad.rightStick.angle <= -45f && Hinput.anyGamepad.rightStick.angle > -135f);
+    }
+    public static bool OnRightStickMoved_Right()
+    {
+        return (Hinput.anyGamepad.rightStick.angle > -45f && Hinput.anyGamepad.rightStick.angle <= 45f && Hinput.anyGamepad.rightStick.angle != 0);
+    }
+    public static bool OnRightStickMoved_Left()
+    {
+        return (
+            (Hinput.anyGamepad.rightStick.angle > 135f && Hinput.anyGamepad.rightStick.angle <= 180f) ||
+            (Hinput.anyGamepad.rightStick.angle <= -135f && Hinput.anyGamepad.rightStick.angle >= -180f)
+        );
+    }
+    public enum Arrow
+    {
+        Up, Down, Left, Right, Center
+    }
+    public static Arrow OnLeftStickMoved()
+    {
+        if (OnLeftStickMoved_Up()) return Arrow.Up;
+        if (OnLeftStickMoved_Down()) return Arrow.Down;
+        if (OnLeftStickMoved_Left()) return Arrow.Left;
+        if (OnLeftStickMoved_Right()) return Arrow.Right;
+        return Arrow.Center;
+    }
+    public static Arrow OnRightStickMoved()
+    {
+        if (OnRightStickMoved_Up()) return Arrow.Up;
+        if (OnRightStickMoved_Down()) return Arrow.Down;
+        if (OnRightStickMoved_Left()) return Arrow.Left;
+        if (OnRightStickMoved_Right()) return Arrow.Right;
+        return Arrow.Center;
+    }
+
     public static void Vibrate()
     {
         Hinput.anyGamepad.Vibrate();
     }
 
     #endregion
+
+    #region Internal commands, do not touch them
 
     private static bool canPress()
     {
@@ -153,6 +254,12 @@ public class Joypad : MonoBehaviour
         if (OnButtonPressed_DownArrow()) Debug.Log("Pressed Down");
         if (OnButtonPressed_RightArrow()) Debug.Log("Pressed Right");
         if (OnButtonPressed_LeftArrow()) Debug.Log("Pressed Left");
+        Arrow a = OnLeftStickMoved();
+        if (a != Arrow.Center) Debug.Log("Left stick movement at " + a);
+        a = OnRightStickMoved();
+        if (a != Arrow.Center) Debug.Log("Right stick movement at " + a);
     }
+
+    #endregion
 
 }
