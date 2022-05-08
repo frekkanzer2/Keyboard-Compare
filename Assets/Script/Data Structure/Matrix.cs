@@ -137,6 +137,7 @@ public class Matrix<T> where T : MonoBehaviour
         for (int j = 0; j < dim.y; j++)
             if (rows[row][j] != null)
                 toReturn.Add(rows[row][j]);
+            else toReturn.Add(null);
         return toReturn;
     }
 
@@ -147,6 +148,7 @@ public class Matrix<T> where T : MonoBehaviour
             for (int j = 0; j < dim.y; j++)
                 if (rows[i][j] != null)
                     toReturn.Add(rows[i][j]);
+                else toReturn.Add(null);
         return toReturn;
     }
 
@@ -157,7 +159,8 @@ public class Matrix<T> where T : MonoBehaviour
         {
             String rowbuffer = "";
             foreach (T t in GetRow(i))
-                rowbuffer += t.ToString();
+                if (t == null) rowbuffer += "{ NULL }";
+                else rowbuffer += t.ToString();
             Debug.Log("Row" + i + "=[" + rowbuffer + "]");
         }
     }

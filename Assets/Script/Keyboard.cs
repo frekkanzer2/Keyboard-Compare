@@ -6,8 +6,26 @@ using System;
 public class Keyboard : MonoBehaviour
 {
 
+    private class Vector2Int
+    {
+        public int x;
+        public int y;
+        public Vector2Int(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+        public void load(Vector2Int v)
+        {
+            this.x = v.x;
+            this.y = v.y;
+        }
+    }
+
+    private Vector2Int pointer;
     private bool isCaps = false;
     private Matrix<Key> keys;
+    private Key pointedKey = null;
 
     public List<RowOfKeys> keyboard_rows;
 
@@ -43,11 +61,71 @@ public class Keyboard : MonoBehaviour
         foreach (RowOfKeys rok in keyboard_rows)
             rok.resizeWithNull(max_count);
         LoadMatrix(keyboard_rows.Count, max_count);
+        pointer = new Vector2Int(0, 0);
     }
 
     private void Update()
     {
         if (StringBuffer.CONSOLE_ON) StringBuffer.getString();
+        pointedKey = keys.Get(pointer.y, pointer.x);
+        List<Key> all = keys.GetAll();
+        foreach(Key k in all)
+        {
+            if (k != null)
+            {
+                if (!k.Equals(pointedKey))
+                    k.setHighlight(false);
+                else k.setHighlight(true);
+            }
+        }
+
+        #region Joypad movement
+
+        if (Joypad.OnButtonPressed_RightArrow() && pointer.x < keys.Columns()-1)
+        {
+            Vector2Int tempPointer = new Vector2Int(0, 0);
+            tempPointer.load(pointer);
+            tempPointer.x++;
+            Key toCheck = keys.Get(tempPointer.y, tempPointer.x);
+            if (toCheck != null)
+                pointer.load(tempPointer);
+        } else if (Joypad.OnButtonPressed_LeftArrow() && pointer.x > 0)
+        {
+            Vector2Int tempPointer = new Vector2Int(0, 0);
+            tempPointer.load(pointer);
+            tempPointer.x--;
+            Key toCheck = keys.Get(tempPointer.y, tempPointer.x);
+            if (toCheck != null)
+                pointer.load(tempPointer);
+        } else if (Joypad.OnButtonPressed_UpArrow() && pointer.y > 0)
+        {
+            Vector2Int tempPointer = new Vector2Int(0, 0);
+            tempPointer.load(pointer);
+            tempPointer.y--;
+            Key toCheck = keys.Get(tempPointer.y, tempPointer.x);
+            if (toCheck != null)
+                pointer.load(tempPointer);
+        } else if (Joypad.OnButtonPressed_DownArrow() && pointer.y < keys.Rows()-1)
+        {
+            Vector2Int tempPointer = new Vector2Int(0, 0);
+            tempPointer.load(pointer);
+            tempPointer.y++;
+            Key toCheck = keys.Get(tempPointer.y, tempPointer.x);
+            if (toCheck != null)
+                pointer.load(tempPointer);
+        }
+
+        #endregion
+
+        #region Joypad selection
+
+        if (Joypad.OnButtonPressed_A())
+        {
+            onCharPressed_ID(pointedKey.getID());
+        }
+
+        #endregion
+
     }
 
     private void LoadMatrix(int rmax, int cmax)
@@ -63,16 +141,40 @@ public class Keyboard : MonoBehaviour
         keys.Debug_View();
     }
 
-    private void pressedCharacter(char c)
+    private void onCharPressed_ID(string ID)
     {
-        StringBuffer.addChar(c);
+        switch (ID)
+        {
+            // Add letters here
+            case "Q":
+                onCharPressed_Q();
+                break;
+            case "W":
+                onCharPressed_W();
+                break;
+            case "E":
+                onCharPressed_E();
+                break;
+            case "A":
+                onCharPressed_A();
+                break;
+            case "S":
+                onCharPressed_S();
+                break;
+            // Add numbers here
+            case "1":
+                onCharPressed_1();
+                break;
+            // Add special characters here
+
+        }
     }
 
     #region NUMBERS
 
     public void onCharPressed_1()
     {
-        pressedCharacter('1');
+        StringBuffer.addChar('1');
     }
 
     // Create every number here
@@ -84,8 +186,32 @@ public class Keyboard : MonoBehaviour
     public void onCharPressed_Q()
     {
         Tuple<char, char> ch = new Tuple<char, char>('q', 'Q');
-        if (!isCaps) pressedCharacter(ch.Item1);
-        else pressedCharacter(ch.Item2);
+        if (!isCaps) StringBuffer.addChar(ch.Item1);
+        else StringBuffer.addChar(ch.Item2);
+    }
+    public void onCharPressed_W()
+    {
+        Tuple<char, char> ch = new Tuple<char, char>('w', 'W');
+        if (!isCaps) StringBuffer.addChar(ch.Item1);
+        else StringBuffer.addChar(ch.Item2);
+    }
+    public void onCharPressed_E()
+    {
+        Tuple<char, char> ch = new Tuple<char, char>('e', 'E');
+        if (!isCaps) StringBuffer.addChar(ch.Item1);
+        else StringBuffer.addChar(ch.Item2);
+    }
+    public void onCharPressed_A()
+    {
+        Tuple<char, char> ch = new Tuple<char, char>('a', 'A');
+        if (!isCaps) StringBuffer.addChar(ch.Item1);
+        else StringBuffer.addChar(ch.Item2);
+    }
+    public void onCharPressed_S()
+    {
+        Tuple<char, char> ch = new Tuple<char, char>('s', 'S');
+        if (!isCaps) StringBuffer.addChar(ch.Item1);
+        else StringBuffer.addChar(ch.Item2);
     }
 
     // Create every character here
@@ -93,7 +219,7 @@ public class Keyboard : MonoBehaviour
     #endregion
 
     #region COMMANDS
-    
+
     public void onBackspacePressed()
     {
         StringBuffer.removeChar();
@@ -113,10 +239,11 @@ public class Keyboard : MonoBehaviour
     {
         if (isCaps) isCaps = false;
         else isCaps = true;
-        /*foreach (Key k in ???)
+        foreach (Key k in keys.GetAll())
         {
-            k.setCap(isCaps);
-        }*/
+            if (k != null)
+                k.setCap(isCaps);
+        }
     }
 
     #endregion

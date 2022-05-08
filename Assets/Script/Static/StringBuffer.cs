@@ -7,8 +7,8 @@ public static class StringBuffer
 
     public static List<char> _buffer = new List<char>();
     public static int _bufferindex;
-    private static string _POINTER_CHAR = "?";
-    public static bool CONSOLE_ON = false;
+    private static string _POINTER_CHAR = " ¦ ";
+    public static bool CONSOLE_ON = true;
 
     public static void addChar(char c)
     {
