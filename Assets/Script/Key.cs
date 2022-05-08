@@ -56,4 +56,9 @@ public class Key : MonoBehaviour
         return this._c.Equals(((Key)other).getLowerChar());
     }
 
+    public override string ToString()
+    {
+        return "{ Key " + this._text.text + " }";
+    }
+
 }

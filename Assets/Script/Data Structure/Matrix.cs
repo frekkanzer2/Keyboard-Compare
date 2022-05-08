@@ -56,6 +56,18 @@ public class Matrix<T> where T : MonoBehaviour
         throw new OutOfMemoryException("Matrix limit reached: cannot add new items");
     }
 
+    public void AddIn(T item, int row)
+    {
+        for (int j = 0; j < dim.y; j++)
+            if (rows[row][j] == null)
+            {
+                rows[row][j] = item;
+                return;
+            }
+        // every place is occupied
+        throw new OutOfMemoryException("Matrix limit reached: cannot add new items");
+    }
+
     public void Clear()
     {
         foreach (List<T> row in rows)
@@ -118,9 +130,47 @@ public class Matrix<T> where T : MonoBehaviour
         return rows[row][column];
     }
 
+    public List<T> GetRow(int row)
+    {
+        if (!sanityCheck(row)) throw new ArgumentOutOfRangeException("Row parameter exceeds the limit");
+        List<T> toReturn = new List<T>();
+        for (int j = 0; j < dim.y; j++)
+            if (rows[row][j] != null)
+                toReturn.Add(rows[row][j]);
+        return toReturn;
+    }
+
+    public List<T> GetAll()
+    {
+        List<T> toReturn = new List<T>();
+        for (int i = 0; i < dim.x; i++)
+            for (int j = 0; j < dim.y; j++)
+                if (rows[i][j] != null)
+                    toReturn.Add(rows[i][j]);
+        return toReturn;
+    }
+
+    public void Debug_View()
+    {
+        Debug.Log("Generated Matrix[" + dim.x + "," + dim.y + "]");
+        for (int i = 0; i < dim.x; i++)
+        {
+            String rowbuffer = "";
+            foreach (T t in GetRow(i))
+                rowbuffer += t.ToString();
+            Debug.Log("Row" + i + "=[" + rowbuffer + "]");
+        }
+    }
+
     private bool sanityCheck(int row, int column)
     {
         if (row >= Rows() || row < 0 || column >= Columns() || column < 0) return false;
+        return true;
+    }
+
+    private bool sanityCheck(int row)
+    {
+        if (row >= Rows() || row < 0) return false;
         return true;
     }
 

@@ -7,11 +7,60 @@ public class Keyboard : MonoBehaviour
 {
 
     private bool isCaps = false;
-    public List<Key> listOfKeys;
+    private Matrix<Key> keys;
+
+    public List<RowOfKeys> keyboard_rows;
+
+    [Serializable]
+    public class RowOfKeys
+    {
+        public List<Key> keyboard_columns;
+        public List<Key> getKeys()
+        {
+            return keyboard_columns;
+        }
+        public int Count()
+        {
+            return keyboard_columns.Count;
+        }
+        public void resizeWithNull(int size)
+        {
+            if (size > Count())
+            {
+                int toAdd = Count() - size;
+                for (int i = 0; i < toAdd; i++)
+                    keyboard_columns.Add(null);
+            }
+        }
+    }
+
+    private void Start()
+    {
+        int max_count = -1;
+        foreach (RowOfKeys rok in keyboard_rows)
+            if (max_count < rok.Count())
+                max_count = rok.Count();
+        foreach (RowOfKeys rok in keyboard_rows)
+            rok.resizeWithNull(max_count);
+        LoadMatrix(keyboard_rows.Count, max_count);
+    }
 
     private void Update()
     {
         if (StringBuffer.CONSOLE_ON) StringBuffer.getString();
+    }
+
+    private void LoadMatrix(int rmax, int cmax)
+    {
+        keys = new Matrix<Key>(rmax, cmax);
+        int rowCounter = 0;
+        foreach (RowOfKeys rok in keyboard_rows)
+        {
+            foreach (Key k in rok.getKeys())
+                keys.AddIn(k, rowCounter);
+            rowCounter++;
+        }
+        keys.Debug_View();
     }
 
     private void pressedCharacter(char c)
@@ -64,10 +113,10 @@ public class Keyboard : MonoBehaviour
     {
         if (isCaps) isCaps = false;
         else isCaps = true;
-        foreach (Key k in listOfKeys)
+        /*foreach (Key k in ???)
         {
             k.setCap(isCaps);
-        }
+        }*/
     }
 
     #endregion
